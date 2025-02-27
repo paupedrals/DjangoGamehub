@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <h2>{{ game.name }}</h2>
+  <p>{{ game.description }}</p>
+  <canvas id="space-invaders-canvas" width="800" height="600"></canvas>
+  <script src="{% static 'js/space_invaders.js' %}"></script>
+  <script src="{% static 'js/score_submit.js' %}"></script>
+
+  <div class="cheat-form">
+    <h3>Cheat Mode</h3>
+    <form method="post" action="">
+      {% csrf_token %}
+      <label for="cheat_score">Enter Score:</label>
+      <input type="number" name="cheat_score" id="cheat_score" required>
+      <button type="submit">Set Score</button>
+    </form>
+  </div>
+{% endblock %}

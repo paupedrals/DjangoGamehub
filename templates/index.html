@@ -1,0 +1,100 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Welcome to GameHub</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+        /* Centering the image */
+        .centered-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70vh; /* Adjust the height of the section */
+        }
+        .centered-image img {
+            max-width: 80%; /* Limits the width to 80% of the screen */
+            max-height: 500px; /* Ensures it does not get too tall */
+            object-fit: contain; /* Maintains aspect ratio */
+        }
+
+        /* Contact button styling */
+        .contact-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+        .contact-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: cyan;
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .contact-button:hover {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    {% include "base.html" %} <!-- This inserts the navigation bar -->
+
+    <h1>Welcome to GameHub</h1>
+    
+    <div class="centered-image">
+        <img src="{% static 'images/landing.png' %}" alt="GameHub Landing">
+    </div>
+
+    <div class="content">
+        {% if user.is_authenticated %}
+            <p>Hello, {{ user.username }}! <a href="{% url 'userpage:profile' %}">Go to your profile</a></p>
+            <p><a href="{% url 'accounts:logout' %}">Logout</a></p>
+        {% else %}
+            <p><a href="{% url 'accounts:login' %}">Log in</a> or <a href="{% url 'accounts:signup' %}">Sign up</a> to get started!</p>
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="contact-wrapper">
+        <p>Need help or have suggestions? Reach out to us!</p>
+        <a href="{% url 'userpage:contact_form' %}" class="contact-button">Contact Us</a>
+    </div>
+{% endif %}
+
+<style>
+    .contact-wrapper {
+        text-align: center;
+        margin-top: 40px; /* Adds space between content and button */
+        padding-bottom: 20px;
+    }
+    .contact-button {
+        display: inline-block;
+        padding: 15px 30px;
+        background-color: cyan;
+        color: black;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 5px;
+        transition: 0.3s;
+        margin-top: 10px; /* Adds spacing between text and button */
+    }
+    .contact-button:hover {
+        background-color: white;
+    }
+</style>
+
+
+</body>
+</html>

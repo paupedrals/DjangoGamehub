@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Available Games</h2>
+  {% if games %}
+    <ul>
+      {% for game in games %}
+        <li>
+          <a href="{% url 'games:game_detail' game.id %}">{{ game.name }}</a> - {{ game.description }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No games available for your selected genres.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,179 @@
+/* static/css/style.css */
+
+/* Use a retro arcade-style font if available */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navigation Bar */
+nav {
+    background-color: #111;
+    border-bottom: 2px solid #0ff;
+    padding: 15px 30px;
+    box-shadow: 0 0 10px #0ff;
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu li {
+    margin: 0 15px;
+}
+
+.nav-menu li a {
+    color: #0ff;
+    text-decoration: none;
+    font-size: 1.1em;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+    transition: color 0.3s ease;
+}
+
+.nav-menu li a:hover {
+    color: #ff0;
+    text-shadow: 0 0 10px #ff0, 0 0 15px #ff0;
+}
+
+/* Container */
+.container {
+    padding: 30px;
+}
+
+/* Headings */
+h1, h2, h3 {
+    text-align: center;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+    margin-bottom: 20px;
+}
+
+/* Paragraphs */
+p {
+    color: #ddd;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Form Elements */
+form {
+    max-width: 500px;
+    margin: 20px auto;
+    background-color: #111;
+    padding: 20px;
+    border: 2px solid #0ff;
+    box-shadow: 0 0 10px #0ff;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background-color: #222;
+    border: 1px solid #0ff;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+}
+
+input[type="submit"],
+button {
+    background-color: #0ff;
+    border: none !important;  /* Ensure no borders */
+    color: #000;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: none !important;  /* Prevents extra glow */
+    outline: none !important;  /* Removes any default focus box */
+}
+
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: #ff0;
+    color: #000;
+}
+
+/* Links */
+a {
+    color: #0ff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff0;
+}
+
+/* Additional styling for retro neon effects */
+.neon-text {
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+.neon-border {
+    border: 2px solid #0ff;
+    box-shadow: 0 0 10px #0ff;
+}
+
+/* Canvas elements (if needed) */
+canvas {
+    display: block;
+    margin: 20px auto;
+    background-color: #000;
+    box-shadow: 0 0 15px #0ff;
+}
+
+
+/* static/css/style.css */
+
+/* Scoreboard Table Styling */
+.scoreboard-table {
+    width: 80%;               /* Adjust as needed */
+    margin: 20px auto;        /* Center horizontally */
+    border-collapse: collapse; 
+    box-shadow: 0 0 10px #0ff; /* Neon glow around table */
+    text-align: left;
+}
+
+.scoreboard-table th,
+.scoreboard-table td {
+    border: 2px solid #0ff;   /* Neon border */
+    padding: 10px;
+}
+
+.scoreboard-table th {
+    background-color: #111;    /* Dark background for header */
+    color: #0ff;               /* Neon text for header */
+    text-shadow: 0 0 5px #0ff;
+}
+
+.scoreboard-table td {
+    background-color: #000;    /* Black background for rows */
+    color: #fff;
+    text-shadow: 0 0 5px #333;
+}
+
+/* Optional: Hover effect for rows */
+.scoreboard-table tr:hover td {
+    background-color: #222;
+    text-shadow: 0 0 5px #0ff;
+}
+
+

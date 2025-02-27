@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Global Scoreboard</h2>
+  <table class="scoreboard-table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Game</th>
+        <th>Score</th>
+        <th>Date</th>
+        {% if user.is_superuser %}
+          <th>Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for score in scores %}
+        <tr>
+          <td>{{ score.user.username }}</td>
+          <td>{{ score.game.name }}</td>
+          <td>{{ score.value }}</td>
+          <td>{{ score.created_at|date:"M d, Y H:i" }}</td>
+          {% if user.is_superuser %}
+            <td>
+              <form method="post" action="{% url 'games:delete_score' score.id %}">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

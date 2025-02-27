@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ user.username }}'s Profile</h2>
+
+  <h3>Select Your Favorite Genres</h3>
+  <form method="post">
+    {% csrf_token %}
+    {% for genre in genres %}
+      <div>
+        <input type="checkbox" name="favorite_genres" value="{{ genre.id }}"
+               {% if genre in profile.favorite_genres.all %}checked{% endif %}>
+        <label>{{ genre.name }}</label>
+      </div>
+    {% endfor %}
+    <button type="submit">Update Preferences</button>
+  </form>
+
+  <h3>Your Scores</h3>
+  {% if scores %}
+    <ul>
+      {% for score in scores %}
+        <li>{{ score.game.name }}: {{ score.value }} ({{ score.created_at|date:"M d, Y H:i" }})</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No scores available.</p>
+  {% endif %}
+
+  <h3>Your Messages</h3>
+  <div class="messages-container">
+      {% for message in messages %}
+          <div class="message-box">
+              <p><strong>{{ message.title }}</strong> - {{ message.created_at }}</p>
+              <p>{{ message.message }}</p>
+              
+              {% if message.reply_to %}
+                  <p class="admin-reply">(Admin Reply to: {{ message.reply_to.title }})</p>
+              {% endif %}
+              
+              {% if not message.reply_to %}  <!-- Users can only delete/edit their original messages -->
+                  <a href="{% url 'userpage:edit_message' message.id %}" class="edit-button">Edit</a> |
+                  <form method="post" action="{% url 'userpage:delete_message' message.id %}" class="delete-form">
+                      {% csrf_token %}
+                      <button type="submit" class="delete-button">Delete</button>
+                  </form>
+              {% endif %}
+          </div>
+      {% endfor %}
+  </div>
+
+  <style>
+      .messages-container {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 600px;
+          margin: 0 auto;
+      }
+      .message-box {
+          padding: 10px;
+          border: 2px solid cyan;
+          border-radius: 5px;
+          background-color: black;
+          color: white;
+          box-shadow: 0px 0px 5px cyan;
+      }
+      .admin-reply {
+          color: cyan;
+          font-style: italic;
+          margin-top: 5px;
+      }
+      .edit-button {
+          background: none;
+          border: none;
+          color: cyan;
+          font-weight: bold;
+          cursor: pointer;
+          text-decoration: none;
+          padding: 5px 10px;
+      }
+      .delete-button {
+          background: none;
+          border: none;
+          color: cyan;
+          font-weight: bold;
+          cursor: pointer;
+          text-decoration: none;
+          padding: 5px 10px;
+      }
+      .delete-button:hover {
+          color: red;
+      }
+      .delete-form {
+          display: inline-block; /* Ensures the delete form does not create a new block */
+          margin: 0;
+          padding: 0;
+      }
+  </style>
+
+  {% if user.is_superuser %}
+    <div class="admin-actions">
+      <h3>Admin Actions</h3>
+      <form method="post" action="{% url 'userpage:delete_scores' %}">
+        {% csrf_token %}
+        <button type="submit">Delete All My Scores</button>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}

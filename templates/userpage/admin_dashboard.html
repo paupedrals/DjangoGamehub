@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Admin Dashboard - User Management</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Scores Count</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.score_set.count }}</td>
+          <td>
+            <form method="post" action="{% url 'userpage:delete_user_scores' user.id %}">
+              {% csrf_token %}
+              <button type="submit">Delete All Scores</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Contact Messages</h2>
+  <div class="message-container">
+      {% for message in messages %}
+          <div class="message-box">
+              <p><strong>User:</strong> {{ message.user.username }}</p>
+              <p><strong>Title:</strong> {{ message.title }}</p>
+              <p><strong>Message:</strong> {{ message.message }}</p>
+              <p><strong>Date:</strong> {{ message.created_at }}</p>
+              {% if not message.reply_to %}
+                  <a href="{% url 'userpage:reply_to_message' message.id %}">Reply</a>
+              {% else %}
+                  <p style="color: cyan;">(Reply to: {{ message.reply_to.title }})</p>
+              {% endif %}
+          </div>
+      {% endfor %}
+  </div>
+  
+  <style>
+      .message-container {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+      .message-box {
+          padding: 10px;
+          border: 2px solid cyan;
+          border-radius: 5px;
+          background-color: black;
+          color: white;
+      }
+  </style>
+  
+
+{% endblock %}

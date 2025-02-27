@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameHub</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            <ul class="nav-menu">
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'userpage:profile' %}">Profile</a></li>
+                <li><a href="{% url 'games:game_list' %}">Games</a></li>
+                <li><a href="{% url 'games:global_scoreboard' %}">Scoreboard</a></li>
+                <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                {% if user.is_superuser %}
+                    <li><a href="{% url 'userpage:admin_dashboard' %}">Admin Dashboard</a></li>
+                {% endif %}
+            </ul>
+        {% else %}
+            <div class="nav-guest">
+                <a href="{% url 'accounts:login' %}">To enjoy this awesome nav menu, log in first</a>
+            </div>
+        {% endif %}
+    </nav>
+
+    <style>
+        /* Styling for guest message */
+        .nav-guest {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: black; /* Matches dark theme */
+    border: 2px solid cyan; /* Adds a glowing effect like your form */
+    padding: 10px;
+    text-shadow: 0px 0px 5px cyan; /* Adds a glow effect to the text */
+}
+.nav-guest a {
+    text-decoration: none;
+    color: cyan; /* Matches the glowing text effect */
+    font-weight: bold;
+}
+.nav-guest a:hover {
+    text-decoration: underline;
+    color: white; /* Subtle hover effect */
+}
+
+    </style>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>
