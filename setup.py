@@ -2,35 +2,33 @@ import os
 import subprocess
 import sys
 
-def setup_environment():
-    # Define virtual environment path
-    venv_path = os.path.join(os.getcwd(), "venv")
-    activate_script = "Scripts/activate.bat" if os.name == "nt" else "bin/activate"
+def main():
+    # Get the script's directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Create virtual environment if it doesn’t exist
+    # Define the virtual environment path
+    venv_path = os.path.join(script_dir, "venv")
+
+    # Create the virtual environment if it doesn't exist
     if not os.path.exists(venv_path):
         print("Creating virtual environment...")
-        subprocess.run([sys.executable, "-m", "venv", "venv"], check=True)
+        subprocess.run([sys.executable, "-m", "venv", "venv"], cwd=script_dir)
         print("Virtual environment created.")
     else:
         print("Virtual environment already exists.")
 
-    # Activate and install dependencies (platform-specific)
-    if os.name == "nt":  # Windows
-        activate_cmd = os.path.join(venv_path, activate_script)
-        install_cmd = f"call {activate_cmd} && pip install -r requirements.txt"
-    else:  # macOS/Linux
-        activate_cmd = os.path.join(venv_path, activate_script)
-        install_cmd = f"source {activate_cmd} && pip install -r requirements.txt"
+    # Use the virtual environment's Python directly
+    venv_python = os.path.join(venv_path, "Scripts", "python.exe") if os.name == "nt" else os.path.join(venv_path, "bin", "python")
 
-    print("Activating virtual environment and installing dependencies...")
-    subprocess.run(install_cmd, shell=True, check=True)
-    print("Setup complete! Note: You may need to manually activate the environment afterward.")
+    # Install dependencies
+    print("Installing dependencies from requirements.txt...")
+    subprocess.run([venv_python, "-m", "pip", "install", "-r", "requirements.txt"], cwd=script_dir)
+
+    # Run the server
+    print("Starting the server...")
+    print("To close the server press Ctrl+C.")
+
+    subprocess.run([venv_python, "manage.py", "runserver"], cwd=script_dir)
 
 if __name__ == "__main__":
-    try:
-        setup_environment()
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
+    main()
