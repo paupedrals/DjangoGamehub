@@ -4,6 +4,8 @@ from games.models import Genre
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
+    image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     favorite_genres = models.ManyToManyField(Genre, blank=True)
 
     def __str__(self):

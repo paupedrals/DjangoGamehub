@@ -3,6 +3,12 @@
 {% block content %}
   <h2>{{ user.username }}'s Profile</h2>
 
+  {% if user.profile.image %}
+    <img src="{{ user.profile.image.url }}" alt="Foto de perfil" style="max-width: 200px;">
+{% else %}
+    <p>No hay foto de perfil</p>
+{% endif %}
+
   <h3>Select Your Favorite Genres</h3>
   <form method="post">
     {% csrf_token %}
