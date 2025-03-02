@@ -1,5 +1,5 @@
 {% load static %}
-{% load user_tags %}
+{% load user_templatetags %} 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,9 +19,12 @@
                 {% if user.is_superuser %}
                     <li><a href="{% url 'userpage:admin_dashboard' %}">Admin Dashboard</a></li>
                 {% endif %}
-                {% if user|in_group:"Moderators" %}
-                <li><a href="{% url 'userpage:moderator_dashboard' %}">Moderator Dashboard</a></li>
+                {% if user|has_group:"Moderator" %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'userpage:moderator_tab' %}">Moderator Panel</a>
+                </li>
                 {% endif %}
+          
             </ul>
         {% else %}
             <div class="nav-guest">

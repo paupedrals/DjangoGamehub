@@ -120,6 +120,11 @@ def delete_user_scores(request, user_id):
     return redirect('profile')  # Adjust to your URL name
 
 @login_required
+@user_passes_test(lambda u: u.groups.filter(name="Moderator").exists())
+def moderator_tab(request):
+    return render(request, 'moderator_tab.html')
+
+@login_required
 @user_passes_test(lambda u: u.is_superuser)
 def reply_to_message(request, message_id):
     """ Allows an admin to reply to a user's message """
