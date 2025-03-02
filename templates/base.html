@@ -1,4 +1,5 @@
 {% load static %}
+{% load user_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +19,7 @@
                 {% if user.is_superuser %}
                     <li><a href="{% url 'userpage:admin_dashboard' %}">Admin Dashboard</a></li>
                 {% endif %}
-                {% if user.groups.all.0.name == 'Moderators' %}
+                {% if user|in_group:"Moderators" %}
                 <li><a href="{% url 'userpage:moderator_dashboard' %}">Moderator Dashboard</a></li>
                 {% endif %}
             </ul>
