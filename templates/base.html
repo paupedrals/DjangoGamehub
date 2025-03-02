@@ -18,6 +18,9 @@
                 {% if user.is_superuser %}
                     <li><a href="{% url 'userpage:admin_dashboard' %}">Admin Dashboard</a></li>
                 {% endif %}
+                {% if user.groups.all.0.name == 'Moderators' %}
+                <li><a href="{% url 'userpage:moderator_dashboard' %}">Moderator Dashboard</a></li>
+                {% endif %}
             </ul>
         {% else %}
             <div class="nav-guest">

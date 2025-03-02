@@ -3,11 +3,22 @@
 {% block content %}
   <h2>{{ user.username }}'s Profile</h2>
 
-  {% if user.profile.image %}
-    <img src="{{ user.profile.image.url }}" alt="Foto de perfil" style="max-width: 200px;">
-{% else %}
-    <p>No hay foto de perfil</p>
-{% endif %}
+  <div style="text-align: center;">
+    {% if user.profile.image %}
+      <img src="{{ user.profile.image.url }}" alt="Foto de perfil" style="max-width: 200px; display: inline-block;">
+    {% else %}
+      <div>
+        <p>No hay foto de perfil</p>
+        <form method="post" enctype="multipart/form-data" action="{% url 'userpage:profile' %}">
+          {% csrf_token %}
+          <label for="image">Upload Profile Photo:</label>
+          <input type="file" name="image" accept="image/*" required>
+          <button type="submit">Upload</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+  
 
   <h3>Select Your Favorite Genres</h3>
   <form method="post">
@@ -54,6 +65,12 @@
           </div>
       {% endfor %}
   </div>
+
+  {% if user.groups.all.0.name == 'Moderators' %}
+  <h1>Moderator Dashboard</h1>
+  <p>Welcome, {{ user.username }}!</p>
+  <a href="{% url 'userpage:delete_user_scores' some_user_id %}">Delete User Scores</a>
+  {% endif %}
 
   <style>
       .messages-container {
