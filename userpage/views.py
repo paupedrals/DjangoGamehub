@@ -2,16 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Profile, ContactMessage
 from .forms import ContactForm, AdminReplyForm
-from games.models import Genre, Score
+from games.models import Genre, Score, Game
 from django.contrib.auth.models import User
+from .decorators import group_required
+from django.http import HttpResponse
 
 @login_required
 def profile_view(request):
     profile = request.user.profile
-    genres = Genre.objects.all()  # Fetch all genres for the form
+    genres = Genre.objects.all()
     scores = Score.objects.filter(user=request.user).order_by('-created_at')
     messages = ContactMessage.objects.filter(user=request.user).order_by('-created_at')
-
     if request.method == 'POST':
         if 'image' in request.FILES:
             profile.image = request.FILES['image']
@@ -21,24 +22,22 @@ def profile_view(request):
             profile.favorite_genres.set(selected_genres)
             profile.save()
         return redirect('userpage:profile')
-
-    context = {
-        'profile': profile,
-        'genres': genres,
-        'scores': scores,
-        'messages': messages,
-    }
+    context = {'profile': profile, 'genres': genres, 'scores': scores, 'messages': messages}
     return render(request, 'userpage/profile.html', context)
 
 @login_required
 def contact_form(request):
+    from django.contrib import messages
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
             contact_message = form.save(commit=False)
             contact_message.user = request.user
             contact_message.save()
+            messages.success(request, "Message sent successfully")
             return redirect('userpage:profile')
+        else:
+            messages.error(request, "Please correct the errors below")
     else:
         form = ContactForm()
     return render(request, "userpage/contact_form.html", {"form": form})
@@ -46,15 +45,13 @@ def contact_form(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def admin_messages(request):
-    """ Allows superusers to view all submitted messages """
     messages = ContactMessage.objects.all().order_by("-created_at")
     return render(request, "userpage/admin_messages.html", {"messages": messages})
 
 @login_required
 def delete_message(request, message_id):
-    """ Allows users to delete their own messages but NOT admin replies """
     message = get_object_or_404(ContactMessage, id=message_id, user=request.user)
-    if message.reply_to:  # If it's a reply, prevent deleting
+    if message.reply_to:
         return redirect("userpage:profile")
     if request.method == "POST":
         message.delete()
@@ -63,14 +60,12 @@ def delete_message(request, message_id):
 
 @login_required
 def delete_scores(request):
-    """ Allows superusers to delete all their own scores """
     if request.method == 'POST' and request.user.is_superuser:
         Score.objects.filter(user=request.user).delete()
     return redirect('userpage:profile')
 
 @login_required
 def admin_dashboard(request):
-    """ Allows superusers to manage users and view admin tools """
     if not request.user.is_superuser:
         return redirect('userpage:profile')
     users = User.objects.all()
@@ -79,21 +74,19 @@ def admin_dashboard(request):
 
 @login_required
 def delete_user_scores(request, user_id):
-    """ Allows superusers to delete other users' scores """
     if not request.user.is_superuser:
         return redirect('userpage:profile')
     try:
         user_to_delete = User.objects.get(id=user_id)
         Score.objects.filter(user=user_to_delete).delete()
     except User.DoesNotExist:
-        pass  # Optionally handle error here
+        pass
     return redirect('userpage:admin_dashboard')
 
 @login_required
 def edit_message(request, message_id):
-    """ Allows users to edit their own messages but NOT admin replies """
     message = get_object_or_404(ContactMessage, id=message_id, user=request.user)
-    if message.reply_to:  # If it's a reply, prevent editing
+    if message.reply_to:
         return redirect("userpage:profile")
     if request.method == "POST":
         form = ContactForm(request.POST, instance=message)
@@ -104,11 +97,6 @@ def edit_message(request, message_id):
         form = ContactForm(instance=message)
     return render(request, "userpage/contact_form.html", {"form": form})
 
-from django.contrib.auth.decorators import login_required
-from .decorators import group_required
-from games.models import Score  # Replace with your app/model
-from django.shortcuts import redirect
-
 @login_required
 @group_required('Moderators')
 def delete_user_scores(request, user_id):
@@ -117,27 +105,59 @@ def delete_user_scores(request, user_id):
         Score.objects.filter(user=user_to_delete).delete()
     except User.DoesNotExist:
         pass
-    return redirect('profile')  # Adjust to your URL name
+    return redirect('profile')
 
 @login_required
-@user_passes_test(lambda u: u.groups.filter(name="Moderator").exists())
+@user_passes_test(lambda u: u.groups.filter(name='Moderator').exists())
 def moderator_tab(request):
-    return render(request, 'moderator_tab.html')
+    messages = ContactMessage.objects.all() if request.user.has_perm('userpage.view_contactmessage') else []
+    scores = Score.objects.select_related('user', 'game').all() if request.user.has_perm('games.view_score') else []
+    if request.method == 'POST':
+        if 'delete_contact_message_id' in request.POST and request.user.has_perm('userpage.delete_contactmessage'):
+            msg_id = request.POST.get('delete_contact_message_id')
+            msg = get_object_or_404(ContactMessage, id=msg_id)
+            msg.delete()
+            return redirect('userpage:moderator_tab')
+        if 'delete_score_id' in request.POST and request.user.has_perm('games.delete_score'):
+            score_id = request.POST.get('delete_score_id')
+            sc = get_object_or_404(Score, id=score_id)
+            sc.delete()
+            return redirect('userpage:moderator_tab')
+        if request.POST.get('action') == 'add_score' and request.user.has_perm('games.add_score'):
+            user_id = request.POST.get('user_id')
+            game_id = request.POST.get('game_id')
+            value = request.POST.get('value')
+            try:
+                user_obj = User.objects.get(id=user_id)
+                game_obj = Game.objects.get(id=game_id)
+                Score.objects.create(user=user_obj, game=game_obj, value=value)
+            except (User.DoesNotExist, Game.DoesNotExist, ValueError):
+                pass
+            return redirect('userpage:moderator_tab')
+    context = {'messages': messages, 'scores': scores}
+    return render(request, 'moderator_tab.html', context)
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def reply_to_message(request, message_id):
-    """ Allows an admin to reply to a user's message """
     original_message = get_object_or_404(ContactMessage, id=message_id)
     if request.method == "POST":
         form = AdminReplyForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
-            reply.user = original_message.user  # Reply is assigned to the original sender
+            reply.user = original_message.user
             reply.title = f"Reply to: {original_message.title}"
-            reply.reply_to = original_message  # Link the reply to the original message
+            reply.reply_to = original_message
             reply.save()
             return redirect("userpage:admin_dashboard")
     else:
         form = AdminReplyForm()
     return render(request, "userpage/reply_form.html", {"form": form, "original_message": original_message})
+
+from django.views import View
+from django.http import HttpResponse
+
+class ExampleCBV(View):
+    def get(self, request):
+        return render(request, 'cbv_example.html')
+

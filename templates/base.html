@@ -6,63 +6,75 @@
     <meta charset="UTF-8">
     <title>GameHub</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}">
 </head>
 <body>
-    <nav>
-        {% if user.is_authenticated %}
-            <ul class="nav-menu">
-                <li><a href="{% url 'index' %}">Home</a></li>
-                <li><a href="{% url 'userpage:profile' %}">Profile</a></li>
-                <li><a href="{% url 'games:game_list' %}">Games</a></li>
-                <li><a href="{% url 'games:global_scoreboard' %}">Scoreboard</a></li>
-                <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
-                {% if user.is_superuser %}
-                    <li><a href="{% url 'userpage:admin_dashboard' %}">Admin Dashboard</a></li>
+    <div class="bootstrap-scope">
+        <nav class="navbar navbar-expand-lg bg-dark">
+            <div class="container-fluid">
+                {% if user.is_authenticated %}
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="mainNav">
+                        <ul class="nav-menu navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item"><a class="nav-link text-light" href="{% url 'index' %}">Home</a></li>
+                            <li class="nav-item"><a class="nav-link text-light" href="{% url 'userpage:profile' %}">Profile</a></li>
+                            <li class="nav-item"><a class="nav-link text-light" href="{% url 'games:game_list' %}">Games</a></li>
+                            <li class="nav-item"><a class="nav-link text-light" href="{% url 'games:global_scoreboard' %}">Scoreboard</a></li>
+                            <li class="nav-item"><a class="nav-link text-light" href="{% url 'accounts:logout' %}">Logout</a></li>
+                            {% if user.is_superuser %}
+                                <li class="nav-item"><a class="nav-link text-light" href="{% url 'userpage:admin_dashboard' %}">Admin Dashboard</a></li>
+                            {% endif %}
+                            {% if user|has_group:"Moderator" %}
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" href="{% url 'userpage:moderator_tab' %}">Moderator Panel</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="nav-guest">
+                        <a href="{% url 'accounts:login' %}">To enjoy this awesome nav menu, log in first</a>
+                    </div>
                 {% endif %}
-                {% if user|has_group:"Moderator" %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'userpage:moderator_tab' %}">Moderator Panel</a>
-                </li>
-                {% endif %}
-          
-            </ul>
-        {% else %}
-            <div class="nav-guest">
-                <a href="{% url 'accounts:login' %}">To enjoy this awesome nav menu, log in first</a>
             </div>
-        {% endif %}
-    </nav>
-
+        </nav>
+    </div>
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
     <style>
-        /* Styling for guest message */
         .nav-guest {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50px;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: black; /* Matches dark theme */
-    border: 2px solid cyan; /* Adds a glowing effect like your form */
-    padding: 10px;
-    text-shadow: 0px 0px 5px cyan; /* Adds a glow effect to the text */
-}
-.nav-guest a {
-    text-decoration: none;
-    color: cyan; /* Matches the glowing text effect */
-    font-weight: bold;
-}
-.nav-guest a:hover {
-    text-decoration: underline;
-    color: white; /* Subtle hover effect */
-}
-
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: black;
+            border: 2px solid cyan;
+            padding: 10px;
+            text-shadow: 0px 0px 5px cyan;
+        }
+        .nav-guest a {
+            text-decoration: none;
+            color: cyan;
+            font-weight: bold;
+        }
+        .nav-guest a:hover {
+            text-decoration: underline;
+            color: white;
+        }
     </style>
-
     <div class="container">
         {% block content %}
         {% endblock %}
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

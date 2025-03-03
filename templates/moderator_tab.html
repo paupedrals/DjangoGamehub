@@ -1,6 +1,100 @@
+<!-- moderator_tab.html -->
 {% extends "base.html" %}
-
 {% block content %}
-    <h2>Moderator Panel</h2>
-    <p>Welcome, Moderator! This is your panel.</p>
+<h2>Moderator Panel</h2>
+
+<!-- CONTACT MESSAGES SECTION -->
+{% if perms.userpage.view_contactmessage %}
+  <h3>Manage Contact Messages</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Title</th>
+        <th>Message</th>
+        {% if perms.userpage.change_contactmessage or perms.userpage.delete_contactmessage %}
+          <th>Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for msg in messages %}
+      <tr>
+        <td>{{ msg.user.username }}</td>
+        <td>{{ msg.title }}</td>
+        <td>{{ msg.message }}</td>
+        {% if perms.userpage.change_contactmessage or perms.userpage.delete_contactmessage %}
+          <td>
+            {% if perms.userpage.change_contactmessage %}
+              <a href="#">Edit</a>
+            {% endif %}
+            {% if perms.userpage.delete_contactmessage %}
+              <form method="post" action="{% url 'userpage:moderator_tab' %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="delete_contact_message_id" value="{{ msg.id }}">
+                <button type="submit">Delete</button>
+              </form>
+            {% endif %}
+          </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>You do not have permission to view contact messages.</p>
+{% endif %}
+
+<!-- SCORES SECTION -->
+{% if perms.games.view_score %}
+  <h3>Manage Scores</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Game</th>
+        <th>Score</th>
+        {% if perms.games.delete_score %}
+          <th>Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for sc in scores %}
+      <tr>
+        <td>{{ sc.user.username }}</td>
+        <td>{{ sc.game.name }}</td>
+        <td>{{ sc.value }}</td>
+        {% if perms.games.delete_score %}
+          <td>
+            <form method="post" action="{% url 'userpage:moderator_tab' %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="delete_score_id" value="{{ sc.id }}">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if perms.games.add_score %}
+    <h4>Add a New Score</h4>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_score">
+      <label>User ID:</label>
+      <input type="text" name="user_id">
+      <label>Game ID:</label>
+      <input type="text" name="game_id">
+      <label>Value:</label>
+      <input type="number" name="value">
+      <button type="submit">Add Score</button>
+    </form>
+  {% endif %}
+{% else %}
+  <p>You do not have permission to view scores.</p>
+{% endif %}
+
 {% endblock %}

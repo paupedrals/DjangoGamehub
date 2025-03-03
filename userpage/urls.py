@@ -1,5 +1,5 @@
-# userpage/urls.py
 from django.urls import path
+from .views import ExampleCBV
 from . import views
 
 app_name = 'userpage'
@@ -14,5 +14,6 @@ urlpatterns = [
     path('user/messages/delete/<int:message_id>/', views.delete_message, name='delete_message'),
     path("user/messages/edit/<int:message_id>/", views.edit_message, name="edit_message"),
     path("admin/messages/reply/<int:message_id>/", views.reply_to_message, name="reply_to_message"),
-    path('moderator/', views.moderator_tab, name='moderator_tab'), 
+    path('moderator/', views.moderator_tab, name='moderator_tab'),
+    path('cbv-example/', ExampleCBV.as_view(), name='cbv_example'),
 ]
