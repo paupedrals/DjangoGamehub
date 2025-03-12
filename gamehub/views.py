@@ -3,5 +3,5 @@ from django.shortcuts import redirect
 
 from django.shortcuts import render
 def index(request):
-    return render(request, "index.html")
+    return render(request, "index.htmlO")
 #This is a test
